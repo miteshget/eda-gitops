@@ -1,0 +1,37 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: patch-route
+  namespace: eda
+immutable: false
+data:
+  exercise2-rulebook.yml: |-
+    ---
+    - name: Listen for newly created Routes
+      hosts: all
+      sources:
+        - sabre1041.eda.k8s:
+            api_version: v1
+            kind: Route
+      rules:
+        - name: Patch a Route
+          condition: event.type == "ADDED"
+          action:
+            run_job_template:
+              name: EDA-OpenShift-Exercise2
+              organization: Default
+      
+  inventory: |-
+    localhost
+    [all:vars]
+    ansible_python_interpreter=/opt/app-root/bin/python
+
+  requirements.yml: |-
+    collections:
+      - name: sabre1041.eda
+        version: 1.0.0
+
+  requirements.txt: |-
+    kubernetes==26.1.0
+    requests==2.28.2
