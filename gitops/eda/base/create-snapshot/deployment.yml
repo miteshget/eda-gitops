@@ -54,11 +54,6 @@ spec:
                 secretKeyRef: 
                   name: openshift-api
                   key: openshift_api_url
-            - name: OCP_TOKEN
-              valueFrom:
-                secretKeyRef: 
-                  name: openshift-api
-                  key: openshift_bearer_token
             - name: OCP_USER_NAME
               valueFrom:
                 secretKeyRef: 

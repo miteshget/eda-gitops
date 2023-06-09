@@ -40,7 +40,7 @@ spec:
               echo "################# Install ansible collection ####################"
               ansible-galaxy collection install -r requirements.yml
               echo "################# Login OpenShift ####################"
-              oc login --token=${OCP_TOKEN} --server=${OCP_API_URL} --certificate-authority=certificate/ca.crt 
+              oc login -u ${OCP_USER_NAME} -p ${OCP_USER_PASSWORD} --server=${OCP_API_URL} --certificate-authority=certificate/ca.crt 
               echo "################# Run ansible rulebook ####################"
               ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url ${AC_WEB_URL} --controller-token ${AC_TOKEN}
           volumeMounts:
@@ -54,11 +54,16 @@ spec:
                 secretKeyRef: 
                   name: openshift-api
                   key: openshift_api_url
-            - name: OCP_TOKEN
+            - name: OCP_USER_NAME
               valueFrom:
                 secretKeyRef: 
                   name: openshift-api
-                  key: openshift_bearer_token
+                  key: openshift_user_name
+            - name: OCP_USER_PASSWORD
+              valueFrom:
+                secretKeyRef: 
+                  name: openshift-api
+                  key: openshift_user_password
             - name: AC_WEB_URL
               valueFrom:
                 secretKeyRef: 
