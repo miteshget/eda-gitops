@@ -2,20 +2,20 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: patch-route
+  name: create-snapshot
   namespace: eda
   labels:
-    app: patch-route
+    app: create-snapshot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: patch-route
+      app: create-snapshot
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: patch-route  
+        app: create-snapshot  
     spec:
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -25,19 +25,24 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-        - name: patch-route
+        - name: create-snapshot
           image: 'quay.io/ansible/ansible-rulebook:v0.12.0'
           workingDir: /mnt
           command:
             - /bin/bash
             - '-c'
             - |
+              echo "################# Download oc cli ####################"
               wget -P /tmp https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.13.0-rc.0/openshift-client-linux.tar.gz
               tar zxvf /tmp/openshift-client-linux.tar.gz -C /opt/app-root/bin/
+              echo "################# Install python dependencies ####################"
               pip3 install -r requirements.txt
+              echo "################# Install ansible collection ####################"
               ansible-galaxy collection install -r requirements.yml
+              echo "################# Login OpenShift ####################"
               oc login --token=${OCP_TOKEN} --server=${OCP_API_URL} --certificate-authority=certificate/ca.crt 
-              ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url ${AC_WEB_URL} --controller-token ${AC_TOKEN}
+              echo "################# Run ansible rulebook ####################"
+              ansible-rulebook -i inventory --rulebook exercise1-rulebook.yml --verbose --controller-url ${AC_WEB_URL} --controller-token ${AC_TOKEN}
           volumeMounts:
             - name: config-volume
               mountPath: /mnt
@@ -70,7 +75,7 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: patch-route
+            name: create-snapshot
         - name: kube-root-ca
           configMap:
             name: kube-root-ca.crt

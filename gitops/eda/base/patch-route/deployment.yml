@@ -2,20 +2,20 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: resource-quota
+  name: patch-route
   namespace: eda
   labels:
-    app: resource-quota
+    app: patch-route
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: resource-quota
+      app: patch-route
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: resource-quota  
+        app: patch-route  
     spec:
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -25,22 +25,24 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-        - name: resource-quota
+        - name: patch-route
           image: 'quay.io/ansible/ansible-rulebook:v0.12.0'
           workingDir: /mnt
           command:
             - /bin/bash
             - '-c'
             - |
+              echo "################# Download oc cli ####################"
               wget -P /tmp https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.13.0-rc.0/openshift-client-linux.tar.gz
               tar zxvf /tmp/openshift-client-linux.tar.gz -C /opt/app-root/bin/
+              echo "################# Install python dependencies ####################"
               pip3 install -r requirements.txt
+              echo "################# Install ansible collection ####################"
               ansible-galaxy collection install -r requirements.yml
+              echo "################# Login OpenShift ####################"
               oc login --token=${OCP_TOKEN} --server=${OCP_API_URL} --certificate-authority=certificate/ca.crt 
-              ansible-rulebook -i inventory --rulebook exercise3-rulebook.yml --verbose --controller-url ${AC_WEB_URL} --controller-token ${AC_TOKEN}
-          ports:
-            - containerPort: 5000
-              protocol: TCP
+              echo "################# Run ansible rulebook ####################"
+              ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url ${AC_WEB_URL} --controller-token ${AC_TOKEN}
           volumeMounts:
             - name: config-volume
               mountPath: /mnt
@@ -73,7 +75,7 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: resource-quota
+            name: patch-route
         - name: kube-root-ca
           configMap:
             name: kube-root-ca.crt
