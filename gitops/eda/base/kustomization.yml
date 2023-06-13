@@ -1,8 +1,4 @@
 resources:
-  - ./common/service-account.yml
-  - ./common/role-binding.yml
-  # - ./common/automation-controller-secret.yml
-  # - ./common/openshift-api-secret.yml
   - ./create-snapshot/config-map.yml
   - ./create-snapshot/deployment.yml
   - ./patch-route/config-map.yml

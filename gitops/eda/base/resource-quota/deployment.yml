@@ -76,7 +76,7 @@ spec:
                   key: aap_controller_token
           securityContext:
             allowPrivilegeEscalation: true
-      serviceAccount: eda-user
+      serviceAccount: eda-sa
       volumes:
         - name: config-volume
           configMap:
