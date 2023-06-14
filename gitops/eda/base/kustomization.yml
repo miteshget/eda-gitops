@@ -8,6 +8,4 @@ resources:
   - ./set-resource-quota-on-namespace/pvc.yml
   - ./set-resource-quota-on-namespace/config-map.yml
   - ./set-resource-quota-on-namespace/deployment.yml
-  - ./create-dump/pvc.yml
-  - ./create-dump/config-map.yml
-  - ./create-dump/deployment.yml
+  
