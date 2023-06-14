@@ -6,7 +6,7 @@ metadata:
   namespace: eda
 immutable: false
 data:
-  exercise3-rulebook.yml: |-
+  rulebook.yml: |-
     ---
     - name: Listen for newly created Namespace
       hosts: all

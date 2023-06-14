@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: resource-quota
+  namespace: eda
+  labels:
+    app: resource-quota
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: "1Gi"

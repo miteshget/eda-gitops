@@ -20,34 +20,60 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
-      securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
+      initContainers:
+        - name: permission-init
+          image: alpine:3.16.0
+          command:
+            - sh
+            - -c
+            - (chmod -R 777 /mnt/downloads)
+          volumeMounts:
+            - name: config-storage
+              mountPath: /mnt/downloads
+          
       containers:
         - name: create-snapshot
           image: 'quay.io/ansible/ansible-rulebook:v0.12.0'
-          workingDir: /mnt
+          workingDir: /mnt/workdir/src
           command:
             - /bin/bash
             - '-c'
             - |
-              echo "################# Download oc cli ####################"
-              wget -P /tmp https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.13.0-rc.0/openshift-client-linux.tar.gz
-              tar zxvf /tmp/openshift-client-linux.tar.gz -C /opt/app-root/bin/
-              echo "################# Install python dependencies ####################"
+              echo "# --------------------------------------------------------"
+              echo "# Download openshift oc cli                               "
+              echo "# --------------------------------------------------------"
+              cd /mnt/downloads
+              ls oc || ( wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.13.0-rc.0/openshift-client-linux.tar.gz && tar zxvf openshift-client-linux.tar.gz )
+              cp oc /opt/app-root/bin/
+              cd /mnt/workdir/src
+
+              echo "# --------------------------------------------------------"
+              echo "# Install python dependencies from requirements file      "
+              echo "# --------------------------------------------------------"
               pip3 install -r requirements.txt
-              echo "################# Install ansible collection ####################"
+
+              echo "# --------------------------------------------------------"
+              echo "# Install Ansible collection from requirements file       "
+              echo "# --------------------------------------------------------"
               ansible-galaxy collection install -r requirements.yml
-              echo "################# Login OpenShift ####################"
-              oc login -u ${OCP_USER_NAME} -p ${OCP_USER_PASSWORD} --server=${OCP_API_URL} --certificate-authority=certificate/ca.crt 
-              echo "################# Run ansible rulebook ####################"
-              ansible-rulebook -i inventory --rulebook exercise1-rulebook.yml --verbose --controller-url ${AC_WEB_URL} --controller-token ${AC_TOKEN}
+
+              echo "# --------------------------------------------------------"
+              echo "# Login to OpenShift                                      "
+              echo "# --------------------------------------------------------"
+              oc login -u ${OCP_USER_NAME} -p ${OCP_USER_PASSWORD} --server=${OCP_API_URL} --certificate-authority=/mnt/workdir/certificate/ca.crt 
+
+              echo "# --------------------------------------------------------"
+              echo "# Run Ansible rulebook                                    "
+              echo "# --------------------------------------------------------"
+              ansible-rulebook -i inventory --rulebook rulebook.yml --verbose --controller-url ${AC_WEB_URL} --controller-token ${AC_TOKEN}
+
           volumeMounts:
-            - name: config-volume
-              mountPath: /mnt
+            - name: config-storage
+              mountPath: /mnt/downloads
+            - name: config-file
+              mountPath: /mnt/workdir/src/
             - name: kube-root-ca
-              mountPath: /mnt/certificate/
+              mountPath: /mnt/workdir/certificate/
           env:
             - name: OCP_API_URL
               valueFrom:
@@ -74,19 +100,14 @@ spec:
                 secretKeyRef: 
                   name: automation-controller
                   key: aap_controller_token
-          securityContext:
-            allowPrivilegeEscalation: true
       serviceAccount: eda-sa
       volumes:
-        - name: config-volume
+        - name: config-file
           configMap:
             name: create-snapshot
         - name: kube-root-ca
           configMap:
             name: kube-root-ca.crt
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
-
+        - name: config-storage
+          persistentVolumeClaim:
+            claimName: create-snapshot     

@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: create-snapshot
+  namespace: eda
+  labels:
+    app: create-snapshot
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: "1Gi"
