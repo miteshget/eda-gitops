@@ -2,24 +2,24 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: create-snapshot
+  name: patch-route-with-cert
   namespace: eda
 immutable: false
 data:
   rulebook.yml: |-
     ---
-    - name: Monitor for new PVCs and create a snapshots
+    - name: Listen for newly created Routes
       hosts: all
       sources:
         - sabre1041.eda.k8s:
             api_version: v1
-            kind: PersistentVolumeClaim
+            kind: Route
       rules:
-        - name: Create Snapshot
+        - name: Patch a Route
           condition: event.type == "ADDED"
           action:
             run_job_template:
-              name: EDA-OpenShift-Exercise1
+              name: EDA-OpenShift-Exercise2
               organization: Default
       
   inventory: |-

@@ -2,20 +2,20 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: patch-route
+  name: set-resource-quota-on-namespace
   namespace: eda
   labels:
-    app: patch-route
+    app: set-resource-quota-on-namespace
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: patch-route
+      app: set-resource-quota-on-namespace
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: patch-route  
+        app: set-resource-quota-on-namespace  
     spec:
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -32,7 +32,7 @@ spec:
               mountPath: /mnt/downloads
           
       containers:
-        - name: patch-route
+        - name: set-resource-quota-on-namespace
           image: 'quay.io/ansible/ansible-rulebook:v0.12.0'
           workingDir: /mnt/workdir/src
           command:
@@ -104,10 +104,11 @@ spec:
       volumes:
         - name: config-file
           configMap:
-            name: patch-route
+            name: set-resource-quota-on-namespace
         - name: kube-root-ca
           configMap:
             name: kube-root-ca.crt
         - name: config-storage
           persistentVolumeClaim:
-            claimName: patch-route    
+            claimName: set-resource-quota-on-namespace    
+

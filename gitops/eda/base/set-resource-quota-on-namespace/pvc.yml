@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: resource-quota
+  name: set-resource-quota-on-namespace
   namespace: eda
   labels:
-    app: resource-quota
+    app: set-resource-quota-on-namespace
 spec:
   accessModes:
   - ReadWriteOnce

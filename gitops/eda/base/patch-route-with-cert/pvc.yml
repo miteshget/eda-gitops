@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: create-snapshot
+  name: patch-route-with-cert
   namespace: eda
   labels:
-    app: create-snapshot
+    app: patch-route-with-cert
 spec:
   accessModes:
   - ReadWriteOnce

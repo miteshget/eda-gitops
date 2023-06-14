@@ -2,7 +2,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: resource-quota
+  name: set-resource-quota-on-namespace
   namespace: eda
 immutable: false
 data:
