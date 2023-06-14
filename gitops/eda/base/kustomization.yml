@@ -1,7 +1,13 @@
 resources:
+  - ./create-snapshot/pvc.yml
   - ./create-snapshot/config-map.yml
   - ./create-snapshot/deployment.yml
+  - ./patch-route/pvc.yml
   - ./patch-route/config-map.yml
   - ./patch-route/deployment.yml
+  - ./resource-quota/pvc.yml
   - ./resource-quota/config-map.yml
   - ./resource-quota/deployment.yml
+  - ./create-dump/pvc.yml
+  - ./create-dump/config-map.yml
+  - ./create-dump/deployment.yml
