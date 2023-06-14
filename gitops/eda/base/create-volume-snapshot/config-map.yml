@@ -19,7 +19,7 @@ data:
           condition: event.type == "ADDED"
           action:
             run_job_template:
-              name: EDA-OpenShift-Exercise1
+              name: create-volume-snapshot
               organization: Default
       
   inventory: |-
