@@ -56,6 +56,6 @@
     - name: Debug message for VolumeSnapshot name and namespace
       ansible.builtin.debug:
         msg: "Name: {{ item.name }}, Namespace: {{ item.namespace }}"
-      loop: "{{ volumesnapshot_details | json_query('resources[*].metadata') }}"
+      loop: "{{ volumesnapshot_details | community.general.json_query('resources[*].metadata') }}"
       loop_control:
         label: "Name: {{ item.name }}, Namespace: {{ item.namespace }}"
